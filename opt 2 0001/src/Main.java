@@ -202,53 +202,49 @@ class IngangsvereistenTest {
     Ingangsvereisten ingangsvereisten = new Ingangsvereisten();
     @Test
     void ingangsvereistencontrole() {
+        assertFalse(ingangsvereisten.Toegangscontrole(false, false,false));
         assertTrue(ingangsvereisten.Toegangscontrole(true, false,false));
         assertTrue(ingangsvereisten.Toegangscontrole(false, true,false));
         assertTrue(ingangsvereisten.Toegangscontrole(false, false,true));
         assertTrue(ingangsvereisten.Toegangscontrole(true, true,true));
 
-        assertFalse(ingangsvereisten.Toegangscontrole(false, false,false));
     }
 }
 class IngangsvereistenTestMetTotaalprijs {
     IngangsvereistenMetTotaalprijs ingangsvereistenMetTotaalprijs=new IngangsvereistenMetTotaalprijs();
     @Test
     void imetp() {
-        assertEquals (-1.0, ingangsvereistenMetTotaalprijs.getPrijs (2, true, true, 12), 0.001);
+        assertEquals (-1.0, ingangsvereistenMetTotaalprijs.getPrijs (1, true, true, 12), 0.001);
+        assertEquals (40.00, ingangsvereistenMetTotaalprijs.getPrijs (1, true, true, 15), 0.001);
 
-        assertEquals (-1.0, ingangsvereistenMetTotaalprijs.getPrijs (2, true, false, 15), 0.001);
-        assertEquals (-1.0, ingangsvereistenMetTotaalprijs.getPrijs (2, true, false, 17), 0.001);
-        assertEquals (-1.0, ingangsvereistenMetTotaalprijs.getPrijs (2, true, false, 21), 0.001);
+        assertEquals (-1.0, ingangsvereistenMetTotaalprijs.getPrijs (6, true, false, 15), 0.001);
+        assertEquals ((36*6), ingangsvereistenMetTotaalprijs.getPrijs (6, true, true, 15), 0.001);
 
-        assertEquals (-1.0, ingangsvereistenMetTotaalprijs.getPrijs (2, false, true, 15), 0.001);
-        assertEquals (-1.0, ingangsvereistenMetTotaalprijs.getPrijs (2, false, true, 17), 0.001);
-        assertEquals (-1.0, ingangsvereistenMetTotaalprijs.getPrijs (2, false, true, 21), 0.001);
 
-        assertEquals (180.0, ingangsvereistenMetTotaalprijs.getPrijs (5, true, true, 21), 0.001);
-        assertEquals (216.0, ingangsvereistenMetTotaalprijs.getPrijs (6, true, true, 21), 0.001);
-        assertEquals (324.0, ingangsvereistenMetTotaalprijs.getPrijs (9, true, true, 21), 0.001);
-        assertEquals (320.0, ingangsvereistenMetTotaalprijs.getPrijs (10, true, true, 21), 0.001);
-        assertEquals (352.0, ingangsvereistenMetTotaalprijs.getPrijs (11, true, true, 21), 0.001);
+        assertEquals (-1.0, ingangsvereistenMetTotaalprijs.getPrijs (11, false, true, 15), 0.001);
+        assertEquals ((11*32), ingangsvereistenMetTotaalprijs.getPrijs (11, true, true, 15), 0.001);
     }
 }
 class TotaalprijsTest {
     Totaalprijs totaalprijs=new Totaalprijs();
     @Test
     void getPrijs() {
-        int aantalteamleden2 = 1;
-        int aantalteamleden3 = 4;
-        int aantalteamleden4 = 5;
-        int aantalteamleden5 = 6;
-        int aantalteamleden6 = 9;
-        int aantalteamleden8 = 10;
-        int aantalteamleden7 = 11;
-        assertEquals (40.00, totaalprijs.getEindPrijs(aantalteamleden2), 0.001);
-        assertEquals (160.00, totaalprijs.getEindPrijs(aantalteamleden3), 0.001);
-        assertEquals (180.00, totaalprijs.getEindPrijs(aantalteamleden4), 0.001);
-        assertEquals (216.00, totaalprijs.getEindPrijs(aantalteamleden5), 0.001);
-        assertEquals (324.00, totaalprijs.getEindPrijs(aantalteamleden6), 0.001);
-        assertEquals (352.00, totaalprijs.getEindPrijs(aantalteamleden7), 0.001);
-        assertEquals (320.00, totaalprijs.getEindPrijs(aantalteamleden8), 0.001);
+        int aantalteamleden0 = 0;
+        int aantalteamleden1 = 1;
+        int aantalteamleden4 = 4;
+        int aantalteamleden5 = 5;
+        int aantalteamleden6 = 6;
+        int aantalteamleden9 = 9;
+        int aantalteamleden10 = 10;
+        int aantalteamleden11 = 11;
+        assertEquals (0.00, totaalprijs.getEindPrijs(aantalteamleden0), 0.001);
+        assertEquals (40.00, totaalprijs.getEindPrijs(aantalteamleden1), 0.001);
+        assertEquals (160.00, totaalprijs.getEindPrijs(aantalteamleden4), 0.001);
+        assertEquals (180.00, totaalprijs.getEindPrijs(aantalteamleden5), 0.001);
+        assertEquals (216.00, totaalprijs.getEindPrijs(aantalteamleden6), 0.001);
+        assertEquals (324.00, totaalprijs.getEindPrijs(aantalteamleden9), 0.001);
+        assertEquals (320.00, totaalprijs.getEindPrijs(aantalteamleden10), 0.001);
+        assertEquals (352.00, totaalprijs.getEindPrijs(aantalteamleden11), 0.001);
     }
 }
 public class Main {
@@ -257,14 +253,10 @@ public class Main {
         Hingangsvereisten hingangsvereisten=new Hingangsvereisten();
         hingangsvereisten.ingangsvereisten();
         hingangsvereisten.Thngangsvereisten();//ingangeisen bepalen
-
-
-
+        
         ticketkostenbrekenen ticketkostenbrekenen=new ticketkostenbrekenen();
         ticketkostenbrekenen.baingangsvereisten();
         ticketkostenbrekenen.HVPtickestprijs();//ticket berekenen
-
-
 
     }
 }
