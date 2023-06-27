@@ -1,0 +1,247 @@
+import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
+
+abstract class CustomerFactory {
+    public abstract CalculationLogic createCalculationLogic();
+}
+class PersonalCustomerFactory extends CustomerFactory {
+    public CalculationLogic createCalculationLogic() {
+        return new CalculationLogic1();
+    }
+}
+class OrganizationCustomerFactory  extends CustomerFactory {
+    public CalculationLogic createCalculationLogic() {
+        return new CalculationLogic2();
+    }
+}
+
+interface CalculationLogic {//Interface voor prijsberekening (enkel ticket).
+    double calculate(Observable observable);
+}//计数逻辑接口
+class CalculationLogic1 implements CalculationLogic {//Voor particulieren
+    private double basisticketkosten = 50.0;
+
+    @Override
+    public double calculate(Observable observable) {
+        if ( observable.getCustomer().getCustomerSize() >= 10) {
+            return basisticketkosten * 0.80;
+        } else if ( observable.getCustomer().getCustomerSize() >= 5) {
+            return basisticketkosten * 0.90;
+        } else if ( observable.getCustomer().getCustomerSize() > 0) {
+            return basisticketkosten;
+        } else {
+            return 0.0; // 添加一个默认返回值
+        }
+
+    }
+}//计数逻辑
+class CalculationLogic2 implements CalculationLogic{//Voor bedrijf
+    private double basisticketkosten = 50.0;
+
+    @Override
+    public double calculate(Observable observable) {
+
+        if ( observable.getCustomer().getCustomerSize() >= 50) {
+            return basisticketkosten * 0.50;
+        } else if ( observable.getCustomer().getCustomerSize() >= 30) {
+            return basisticketkosten * 0.60;
+        } else if (observable.getCustomer().getCustomerSize() >= 20) {
+            return basisticketkosten * 0.70;
+        }else if ( observable.getCustomer().getCustomerSize() > 0) {
+            return basisticketkosten;
+        } else {
+            return 0.0;
+        }
+
+    }
+
+}
+
+class Customer {
+    private String customerType;
+    private int customerSize;
+
+    public Customer(String customerType, int customerSize) {
+        this.customerType = customerType;
+        this.customerSize = customerSize;
+    }
+
+    public String getCustomerType() {
+        return customerType;
+    }
+
+    public int getCustomerSize() {
+        return customerSize;
+    }
+}
+
+class Observable {
+    private Customer customer;
+    private List<Observer> observers = new ArrayList<>();
+    public List<Observer> getList(){return observers;}
+
+    public Observable(Customer customer) {
+        this.customer = customer;
+    }
+    public Customer getCustomer() {
+        return customer;
+    }
+    public void addObserver(Observer observer) {
+        observers.add(observer);
+    }
+    public void receiveQuestion(Observable observable) {
+        for (Observer observer : observers) {observer.update(observable);}}
+
+}
+class Informatieverwerking extends Observable {
+    public Informatieverwerking() {
+        super(new Customer("", 0));
+    }
+
+    public static void invoerverwerking() {
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Voer een klanttype in. <particulier> of <bedrijf>");
+        String klanttyppeString = scanner.nextLine();
+        System.out.println("Vul het aantal tickets in dat je wilt kopen. Houd er rekening mee dat alleen cijfers worden ingevoerd, zoals <1>");
+        int AantalTickets = scanner.nextInt();
+        Customer customer1 = new Customer(klanttyppeString, AantalTickets);
+
+        processCustomer(customer1);
+    }
+
+    public static void processCustomer(Customer customer) {
+        CustomerProcessorStrategy strategy = new CustomerProcessorStrategy();
+        KlanttypeProcessor processor = strategy.getProcessor(customer.getCustomerType());
+
+        Observable answerSystem = new Observable(customer);
+        answerSystem.addObserver(processor);
+
+        answerSystem.receiveQuestion(answerSystem);
+    }
+}
+
+class CustomerProcessorStrategy {
+    private Map<String, KlanttypeProcessor> processors;
+
+    public CustomerProcessorStrategy() {
+        processors = new HashMap<>();
+        processors.put("particulier", new ParticulierProcessor(new PersonalCustomerFactory()));
+        processors.put("bedrijf", new BederijfProcessor(new OrganizationCustomerFactory()));
+    }
+
+    public KlanttypeProcessor getProcessor(String customerType) {
+        return processors.get(customerType);
+    }
+}
+
+
+// 观察者接口
+interface Observer {
+    void update(Observable observable);
+}
+
+// 具体的观察者类
+class KlanttypeProcessor implements Observer {//Elk type gast heeft een andere klantenkorting
+    protected CustomerFactory factory;
+    public KlanttypeProcessor(CustomerFactory factory) {
+        this.factory = factory;
+    }
+    @Override
+    public void update(Observable observable) {
+    }
+}
+
+
+// 具体的观察者类
+class ParticulierProcessor extends KlanttypeProcessor  {
+    public ParticulierProcessor(CustomerFactory factory) {
+        super(factory);
+    }//factory属性
+    @Override
+    public void update(Observable observable) {
+        CalculationLogic calculationLogic = factory.createCalculationLogic();
+        //Maak het overeenkomstige type klantobject volgens de fabriek en los het probleem op
+        double result = calculationLogic.calculate(observable);//根据相应逻辑得出结果
+        //Creëer en gebruik //schermweergave-interface
+        ResultDisplay Hparticulier= new Pantwoordweergave();//使用显示接口ResultDisplay1()
+        Hparticulier.display(result);//调动显示接口（）
+    }
+}
+class BederijfProcessor extends KlanttypeProcessor  {
+    public BederijfProcessor(CustomerFactory factory) {
+        super(factory);
+    }
+
+    @Override
+    public void update(Observable observable) {
+        //Maak het overeenkomstige type klantobject volgens de fabriek en los het probleem op
+        CalculationLogic calculationLogic = factory.createCalculationLogic();
+        double result = calculationLogic.calculate(observable);
+        //Creëer en gebruik //schermweergave-interface
+        ResultDisplay Hbedrijf = new Bantwoordweergave();
+        Hbedrijf.display(result);
+    }
+}
+
+interface ResultDisplay {//schermweergave-interface
+    void display(double result);
+}
+// 结果显示实现类
+class Antwoordweergave implements ResultDisplay{
+    public void display(double result) {}
+
+}
+class Pantwoordweergave extends Antwoordweergave  {
+    @Override
+    public void display(double result) {
+        System.out.println("Er is berekend dat de prijs van een enkele ticket: €"+ result+" is.");
+        System.out.println("");
+
+        System.out.println("Voor particuliere klanten geldt het volgende regel:");
+        System.out.println("Als je je boeking wilt annuleren, neem dan 3 dagewn voor de vertrekdatum contact met ons op, anders krijg je het vooraf bepaalde bedrag niet terug. ");
+        System.out.println("Als je op elk moment je vertrekdatum wilt wijzigen, kies dan voor de <extra> service, die 10.00 euro per persoon kost.");
+        System.out.println("Ook raden we u aan om uw identiteitsdocumenten mee te nemen, zoals: <ID-kaart> <rijbewijs>.");
+        System.out.println("Als het mogelijk is, is het verstandig om uw paspoort mee te nemen, omdat elk land andere eisen stelt aan identiteitsdocumenten.");
+        System.out.println("Als u geen paspoort heeft of meer informatie wilt, neem dan contact met onze klantenservice, daar kunt u meer informatie mee te halen.");
+        System.out.println("");
+
+        System.out.println("Contactgegevens");
+        System.out.println("E-mail: 31623366995.gmail.com");
+        System.out.println("Telefoon: 31623366995");
+        System.out.println("WhatsApp: 31623366995");
+        System.out.println("Contactgegevens:");
+        System.out.println("");
+        System.out.println("Werktijden: dagelijks van 8:30 tot 24:00 uur.");
+    }
+}
+class Bantwoordweergave extends Antwoordweergave  {
+    @Override
+    public void display(double result) {
+        System.out.println("Er is berekend dat de prijs van een enkele ticket: €"+ result+" is.");
+        System.out.println("");
+
+        System.out.println("Voor organiserende klanten, houd rekening met de volgende regels:");
+        System.out.println("Als u uw boeking wilt annuleren, neem dan twee weken voor uw vertrekdatum contact met ons op, anders krijgt u het geboekte bedrag niet terugbetaald. ");
+        System.out.println("U kunt uw vertrekdatum niet wijzigen, dus bevestig vooraf de data van de reis van uw organisatie.");
+        System.out.println("Daarnaast dient u ons twee weken voor de vertrekdatum de relevante documenten van uw organisatie en het paspoort van elke deelnemer te overhandigen.");
+        System.out.println("Als je meer informatie wilt, neem dan contact op met onze klantenservice voor meer informatie.");
+        System.out.println("");
+
+        System.out.println("Contactgegevens");
+        System.out.println("E-mail: 31623366995.gmail.com");
+        System.out.println("Telefoon: 31623366995");
+        System.out.println("WhatsApp: 31623366995");
+        System.out.println("Contactgegevens:");
+        System.out.println("");
+        System.out.println("Werktijden: dagelijks van 8:30 tot 24:00 uur.");
+    }
+
+}
+public class Main {
+    public static void main(String[] args) {
+        Informatieverwerking  observable1 = new Informatieverwerking();
+        observable1.invoerverwerking();
+    }
+}
